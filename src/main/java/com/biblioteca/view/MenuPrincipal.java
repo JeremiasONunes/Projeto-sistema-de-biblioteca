@@ -1,8 +1,8 @@
 package com.biblioteca.view;
 
+import com.biblioteca.exception.*;
 import com.biblioteca.model.*;
 import com.biblioteca.service.BibliotecaService;
-import com.biblioteca.exception.*;
 import java.util.Scanner;
 
 public class MenuPrincipal {
@@ -25,6 +25,7 @@ public class MenuPrincipal {
                     case 5 -> emprestarLivro();
                     case 6 -> devolverLivro();
                     case 7 -> listarEmprestimos();
+                    case 8 -> listarUsuarios();
                     case 0 -> System.out.println("Saindo...");
                     default -> System.out.println("Opção inválida!");
                 }
@@ -43,6 +44,7 @@ public class MenuPrincipal {
         System.out.println("5 - Emprestar Livro");
         System.out.println("6 - Devolver Livro");
         System.out.println("7 - Listar Empréstimos");
+        System.out.println("8 - Listar Usuários");
         System.out.println("0 - Sair");
         System.out.print("Escolha uma opção: ");
     }
@@ -74,7 +76,11 @@ public class MenuPrincipal {
     private void listarLivros() {
         service.listarLivros().forEach(System.out::println);
     }
-    
+
+    private void listarUsuarios() {
+        service.listarUsuarios().forEach(System.out::println);
+    }
+
     private void pesquisarLivro() {
         System.out.print("Digite o termo de busca: ");
         String termo = scanner.nextLine();
