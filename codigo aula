@@ -1,226 +1,95 @@
-package main.java.com.biblioteca.view;
-
-import main.java.com.biblioteca.exception.*;
-import main.java.com.biblioteca.model.*;
-import main.java.com.biblioteca.service.*;
+package main.java.com.biblioteca.service;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
-public class MenuPrincipal {
-	Scanner sc = new Scanner(System.in);
-	BibliotecaService Biblioteca = new BibliotecaService();
-	
-	public void iniciarSistema() {
-		String opcao;
-		System.out.println("Sistema Inicializando ...");
-		System.out.println("Sistema Inicializado!");
-		
-		do {
+import main.java.com.biblioteca.model.*;
+import main.java.com.biblioteca.exception.*;
+import java.time.temporal.ChronoUnit;
 
-			exibirMenuPrincipal();
-			opcao = sc.nextLine();
-			//sc.nextLine();
-			try {
-				switch (opcao) {
-					case "1" ->  {cadastrarLivro();}
-					case "2" ->  {cadastrarUsuario();}
-					case "3" ->  {cadastrarEmprestimo();}
-					case "4" ->  {pesquisarLivro();}
-					case "5" ->  {pesquisarUsuario();}
-					case "6" ->  {devolucao();}
-					case "7" ->  {System.out.println("Listar usuarios");}
-					case "8" ->  {System.out.println("listar emprestismos");}
-					case "9" ->  {System.out.println("listar livros");}
-					case "0" ->  {System.out.println("Sair");}
-					default  ->  throw new IllegalArgumentException("Unexpected value: " + opcao);
-				}
-			} catch (Exception e) {
-				System.out.println("Erro: " + e.getMessage());
-			}			
-		}while (opcao != "0");
+public class BibliotecaService {
+
+	private List<Livro> livros = new ArrayList<>();
+	private List<Usuario> usuarios = new ArrayList<>();
+	private List<Emprestimo> emprestimos = new ArrayList<>();
+	
+
+	
+	public void cadastrarLivro(Livro livro) {
+		this.livros.add(livro);
 	}
-	private void exibirMenuPrincipal() {
-		System.out.println("\n ==========================================");
-		System.out.println("*       Escolha a opção abaixo              *");
-		System.out.println("*                                           *");
-		System.out.println("*    (1) - Cadastrar novo Livro             *");
-		System.out.println("*    (2) - Cadastrar novo Usuário           *");
-		System.out.println("*    (3) - Cadastrar novo empréstimo        *");
-		System.out.println("*    (4) - pesquisar Livro                  *");
-		System.out.println("*    (5) - pesquisar Usuário                *");
-		System.out.println("*    (6) - Devolver Livro                   *");
-		System.out.println("*    (7) - Listar Usuarios                  *");
-		System.out.println("*    (8) - Listar Empréstimos               *");
-		System.out.println("*    (9) - Listar Livros                    *");
-		System.out.println("*    (0) - Sair do sistema                  *");
-		System.out.println("*                                           *");
-		System.out.println("  ==========================================");
+	
+	public void cadastrarUsuario(Usuario usuario) {
+		this.usuarios.add(usuario);
+	}
+	
+	public List<Usuario> listarUsuario() {
+		return new ArrayList<>(usuarios);
+	}
+	public List<Livro> listarLivros() {
+		return new ArrayList<>(livros);
+	}
+	
+	public List<Livro> PesquisarLivro(String termo) {
+		return livros.stream().filter(livro -> livro.getTitulo().toLowerCase().contains(termo.toLowerCase())  ||
+				livro.getAutor().toLowerCase().contains(termo.toLowerCase()) ||				
+				String.valueOf(livro.getAno()).contains(termo))
+				.toList();
+	}
+	
+	public List<Usuario> pesquisarUsuario(String termo){
+		return usuarios.stream().filter(usuario -> usuario.getNome().toLowerCase().contains(termo.toLowerCase()) ||
+				usuario.getMatricula().toLowerCase().contains(termo.toLowerCase())).toList();
 	}
 	
 	
 	
-	private void cadastrarLivro() {
-	
-		System.out.println(" ==========================================");
-		System.out.println("*       Digite o titulo do livro          *");
-		System.out.println(" ==========================================");
-		String titulo = sc.nextLine();
-		
-		System.out.println(" ==========================================");
-		System.out.println("*       Digite o autor do livro           *");
-		System.out.println(" ==========================================");
-		String autor = sc.nextLine();
-		
-		System.out.println(" ==========================================");
-		System.out.println("*       Digite o ano do livro             *");
-		System.out.println(" ==========================================");
-		int ano = sc.nextInt();
-		sc.nextLine();
-		exibirMenuCadastroLivro();
-		String tipoLivro = sc.nextLine();
-		
-		try {
-			switch (tipoLivro) {
-				case "1"-> {
-					System.out.println(" ==========================================");
-					System.out.println("*       Digite o tamanho em MB do livro    *");
-					System.out.println(" ==========================================");
-					double tamanho = sc.nextDouble();
-					sc.nextLine();
-					Biblioteca.cadastrarLivro(new Ebook(titulo, autor, ano, tamanho));
-				}
-				case "2"-> {
-					System.out.println(" ==========================================");
-					System.out.println("*       Digite o nº de paginas do livro   *");
-					System.out.println(" ==========================================");
-					int paginas = sc.nextInt();
-					sc.nextLine();
-					Biblioteca.cadastrarLivro(new Livroimpresso(titulo, autor, ano, paginas));
-				}
-				case "0"-> {
-					System.out.println(" ==========================================");
-					System.out.println("*       Voltando ao menu anterior         *");
-					System.out.println(" ==========================================");
-				}
-				default -> throw new IllegalArgumentException("Unexpected value: " + tipoLivro);}
-		} catch (Exception e) {
-			System.out.println("Erro: " + e.getMessage());
-		}
-		
-	}
-	
-	//cadastro livro
-	private void exibirMenuCadastroLivro() {
-		System.out.println("\n  ==========================================");
-		System.out.println("*       Escolha a opção abaixo              *");
-		System.out.println("*                                           *");
-		System.out.println("*    (1) - Cadastrar Ebook                  *");
-		System.out.println("*    (2) - Cadastrar Livro Impresso         *");
-		System.out.println("*    (0) - Voltar ao menu anterios          *");
-		System.out.println("*                                           *");
-		System.out.println("  ==========================================");
-	}
-	
-	//Cadastro usuario
-	private void cadastrarUsuario() {
-		System.out.println(" ==========================================");
-		System.out.println("*       Digite o nome do Usuario          *");
-		System.out.println(" ==========================================");
-		String nome = sc.nextLine();
-		
-		System.out.println(" ==========================================");
-		System.out.println("*       Digite a matricula do usuario     *");
-		System.out.println(" ==========================================");
-		String matricula = sc.nextLine();
-		
-		
-		exibirMenuCadastroUsuario();
-		String tipoUsuario = sc.nextLine();
-		
-		try {
-			switch (tipoUsuario) {
-				case "1"-> {
-					System.out.println(" ==========================================");
-					System.out.println("*   Digite o departamento do professor    *");
-					System.out.println(" ==========================================");
-					String departemento = sc.nextLine();	
-					Biblioteca.cadastrarUsuario(new Professor(nome, matricula, departemento));
-				}
-				case "2"-> {
-					System.out.println(" ==========================================");
-					System.out.println("*   Digite o curso do aluno    *");
-					System.out.println(" ==========================================");
-					String curso = sc.nextLine();
-					Biblioteca.cadastrarUsuario(new Aluno(nome, matricula, curso));
-				}
-				case "0"-> {
-					System.out.println(" ==========================================");
-					System.out.println("*       Voltando ao menu anterior         *");
-					System.out.println(" ==========================================");
-				}
-				default -> throw new IllegalArgumentException("Unexpected value: " + tipoUsuario);}
-		} catch (Exception e) {
-			System.out.println("Erro: " + e.getMessage());
-		}
-		
-	}
-	
-	private void exibirMenuCadastroUsuario() {
-		System.out.println("\n ==========================================");
-		System.out.println("*       Escolha a opção abaixo              *");
-		System.out.println("*                                           *");
-		System.out.println("*    (1) - Cadastrar Professor              *");
-		System.out.println("*    (2) - Cadastrar Aluno                  *");
-		System.out.println("*    (0) - Voltar ao menu anterios          *");
-		System.out.println("*                                           *");
-		System.out.println("  ==========================================");
-	}
-	
-	
-	//cadastrar emprestimo
-	private void cadastrarEmprestimo() {
-		System.out.println(" ==========================================");
-		System.out.println("*       Digite o matricula do Usuario      *");
-		System.out.println(" ==========================================");
-		String matricula = sc.nextLine();
-		
-		System.out.println(" ==========================================");
-		System.out.println("*       Digite o titulo do livro     *");
-		System.out.println(" ==========================================");
-		String titulo = sc.nextLine();}
+	public void emprestarLivro(String tituloLivro, String matriculaUsuario) 
+	        throws LivroNaoEncontradoException, LivroIndisponivelException {
 
 
-	private void pesquisarLivro() {
-		System.out.println(" ==========================================");
-		System.out.println("*       Digite o termo da pesquisa        *");
-		System.out.println(" ==========================================");
-		String termo = sc.nextLine();
-		try {
-			
-		} catch (Exception e) {
-			System.out.println("Erro: " + e.getMessage());
-		}
+	    Livro livro = livros.stream()
+	            .filter(livros -> livros.getTitulo().toLowerCase().contains(tituloLivro.toLowerCase()))
+	            .findFirst()
+	            .orElseThrow(() -> new LivroNaoEncontradoException("Livro não cadastrado"));
+
+
+	    if (!livro.isDisponivel()) {
+	        throw new LivroIndisponivelException("Livro indisponível: " + livro.getTitulo());
+	    }
+
+
+	    Usuario usuario = usuarios.stream()
+	            .filter(usuarios -> usuarios.getMatricula().equalsIgnoreCase(matriculaUsuario))
+	            .findFirst()
+	            .orElseThrow(() -> new LivroNaoEncontradoException("Usuário não encontrado: " + matriculaUsuario));
+	    
+	    livro.setDisponivel(false);
+	    emprestimos.add(new Emprestimo(livro, usuario));
 	}
 	
-	private void pesquisarUsuario() {
-		System.out.println(" ==========================================");
-		System.out.println("*       Digite o termo da pesquisa        *");
-		System.out.println(" ==========================================");
-		String termo = sc.nextLine();
-		try {
-			
-		} catch (Exception e) {
-			System.out.println("Erro: " + e.getMessage());
-		}
-	}
-	private void devolucao() {
-		System.out.println(" ==========================================");
-		System.out.println("*    Digite o termo da titulo do livro    *");
-		System.out.println(" ==========================================");
-		String tituloLivro = sc.nextLine();
-		try {
-			
-		} catch (Exception e) {
-			System.out.println("Erro: " + e.getMessage());
-		}
-	}
+	public void devolverLivro(String tituloLivro) throws LivroNaoEncontradoException {
+        Emprestimo emprestimo = emprestimos.stream()
+                .filter(emprestimos -> emprestimos.getLivro().getTitulo().equalsIgnoreCase(tituloLivro) && !emprestimos.isDisponivel())
+                .findFirst()
+                .orElseThrow(() -> new LivroNaoEncontradoException("Empréstimo não encontrado para: " + tituloLivro));
+        emprestimo.setDataDevolucaoReal(LocalDate.now());
+        
+        if (emprestimo.getDataDevolucaoReal().isAfter(emprestimo.getDataDevolucaoPrevista())) {
+            long diasAtraso = ChronoUnit.DAYS.between(
+                emprestimo.getDataDevolucaoPrevista(),
+                emprestimo.getDataDevolucaoReal()
+            );
+            long valorMulta = diasAtraso * 4;
+            System.out.println("Multa de atraso: R$ " + valorMulta);
+       
+        }
+    }
+    
+    public List<Emprestimo> listarEmprestimos() {
+        return new ArrayList<>(emprestimos);
+    }
+	
+	
 }
