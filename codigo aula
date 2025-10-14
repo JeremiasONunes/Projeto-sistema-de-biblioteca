@@ -1,95 +1,82 @@
-package main.java.com.biblioteca.service;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+package main.java.com.biblioteca.view;
+
 import java.util.Scanner;
 
-import main.java.com.biblioteca.model.*;
-import main.java.com.biblioteca.exception.*;
-import java.time.temporal.ChronoUnit;
-
-public class BibliotecaService {
-
-	private List<Livro> livros = new ArrayList<>();
-	private List<Usuario> usuarios = new ArrayList<>();
-	private List<Emprestimo> emprestimos = new ArrayList<>();
+public class MenuOpcoes {
+	Scanner sc = new Scanner(System.in);
 	
-
-	
-	public void cadastrarLivro(Livro livro) {
-		this.livros.add(livro);
+	public void exibirMenuOpcoesLimitado() {
+		System.out.println("\n ==========================================");
+		System.out.println("*       Escolha a opção abaixo              *");
+		System.out.println("*                                           *");
+		System.out.println("*    (1) - Alterar Livro       		        *");
+		System.out.println("*    (2) - Alterar Usuário 		            *");
+		System.out.println("*    (3) - Alterar empréstimo   	        *");
+		System.out.println("*    (4) - Deletar livro                    *");
+		System.out.println("*    (5) - Deletar Usuário                  *");
+		System.out.println("*    (6) - Deletar Emprestimo               *");
+		System.out.println("*    (0) - Sair do sistema                  *");
+		System.out.println("*                                           *");
+		System.out.println("  ==========================================");
+	}
+	public void exibirMenuOpcoesAdmin() {
+		System.out.println("\n ==========================================");
+		System.out.println("*       Escolha a opção abaixo              *");
+		System.out.println("*                                           *");
+		System.out.println("*    (1) - Alterar Livro       		        *");
+		System.out.println("*    (2) - Alterar Usuário 		            *");
+		System.out.println("*    (3) - Alterar empréstimo   	        *");
+		System.out.println("*    (4) - Deletar livro                    *");
+		System.out.println("*    (5) - Deletar Usuário                  *");
+		System.out.println("*    (6) - Deletar Emprestimo               *");
+		System.out.println("*    (7) - Deletar Banco de dados           *");
+		System.out.println("*    (0) - Sair do sistema                  *");
+		System.out.println("*                                           *");
+		System.out.println("  ==========================================");
 	}
 	
-	public void cadastrarUsuario(Usuario usuario) {
-		this.usuarios.add(usuario);
+	public void opcoesLimitado(String opcao) {
+		do {
+			opcao = sc.nextLine();
+			//sc.nextLine();
+			try {
+				switch (opcao) {
+					case "1" ->  {System.out.println("opcao 1");}
+					case "2" ->  {System.out.println("opcao 2");}
+					case "3" ->  {System.out.println("opcao 3");}
+					case "4" ->  {System.out.println("opcao 4");}
+					case "5" ->  {System.out.println("opcao 5");}
+					case "6" ->  {System.out.println("opcao 6");}
+					case "0" ->  {System.out.println("Sair");}
+					default  ->  throw new IllegalArgumentException("Unexpected value: " + opcao);
+				}
+			} catch (Exception e) {
+				System.out.println("Erro: " + e.getMessage());
+			}			
+		}while (!opcao.equals("0"));
 	}
 	
-	public List<Usuario> listarUsuario() {
-		return new ArrayList<>(usuarios);
+	public void opcoesAdmin(String opcao) {
+		do {
+			opcao = sc.nextLine();
+			//sc.nextLine();
+			try {
+				switch (opcao) {
+					case "1" ->  {System.out.println("opcao 1");}
+					case "2" ->  {System.out.println("opcao 2");}
+					case "3" ->  {System.out.println("opcao 3");}
+					case "4" ->  {System.out.println("opcao 4");}
+					case "5" ->  {System.out.println("opcao 5");}
+					case "6" ->  {System.out.println("opcao 6");}
+					case "7" ->  {System.out.println("opcao 7");}
+					case "0" ->  {System.out.println("Sair");}
+					default  ->  throw new IllegalArgumentException("Unexpected value: " + opcao);
+				}
+			} catch (Exception e) {
+				System.out.println("Erro: " + e.getMessage());
+			}			
+		}while (!opcao.equals("0"));
 	}
-	public List<Livro> listarLivros() {
-		return new ArrayList<>(livros);
-	}
-	
-	public List<Livro> PesquisarLivro(String termo) {
-		return livros.stream().filter(livro -> livro.getTitulo().toLowerCase().contains(termo.toLowerCase())  ||
-				livro.getAutor().toLowerCase().contains(termo.toLowerCase()) ||				
-				String.valueOf(livro.getAno()).contains(termo))
-				.toList();
-	}
-	
-	public List<Usuario> pesquisarUsuario(String termo){
-		return usuarios.stream().filter(usuario -> usuario.getNome().toLowerCase().contains(termo.toLowerCase()) ||
-				usuario.getMatricula().toLowerCase().contains(termo.toLowerCase())).toList();
-	}
-	
-	
-	
-	public void emprestarLivro(String tituloLivro, String matriculaUsuario) 
-	        throws LivroNaoEncontradoException, LivroIndisponivelException {
-
-
-	    Livro livro = livros.stream()
-	            .filter(livros -> livros.getTitulo().toLowerCase().contains(tituloLivro.toLowerCase()))
-	            .findFirst()
-	            .orElseThrow(() -> new LivroNaoEncontradoException("Livro não cadastrado"));
-
-
-	    if (!livro.isDisponivel()) {
-	        throw new LivroIndisponivelException("Livro indisponível: " + livro.getTitulo());
-	    }
-
-
-	    Usuario usuario = usuarios.stream()
-	            .filter(usuarios -> usuarios.getMatricula().equalsIgnoreCase(matriculaUsuario))
-	            .findFirst()
-	            .orElseThrow(() -> new LivroNaoEncontradoException("Usuário não encontrado: " + matriculaUsuario));
-	    
-	    livro.setDisponivel(false);
-	    emprestimos.add(new Emprestimo(livro, usuario));
-	}
-	
-	public void devolverLivro(String tituloLivro) throws LivroNaoEncontradoException {
-        Emprestimo emprestimo = emprestimos.stream()
-                .filter(emprestimos -> emprestimos.getLivro().getTitulo().equalsIgnoreCase(tituloLivro) && !emprestimos.isDisponivel())
-                .findFirst()
-                .orElseThrow(() -> new LivroNaoEncontradoException("Empréstimo não encontrado para: " + tituloLivro));
-        emprestimo.setDataDevolucaoReal(LocalDate.now());
-        
-        if (emprestimo.getDataDevolucaoReal().isAfter(emprestimo.getDataDevolucaoPrevista())) {
-            long diasAtraso = ChronoUnit.DAYS.between(
-                emprestimo.getDataDevolucaoPrevista(),
-                emprestimo.getDataDevolucaoReal()
-            );
-            long valorMulta = diasAtraso * 4;
-            System.out.println("Multa de atraso: R$ " + valorMulta);
-       
-        }
-    }
-    
-    public List<Emprestimo> listarEmprestimos() {
-        return new ArrayList<>(emprestimos);
-    }
 	
 	
 }
