@@ -2,81 +2,83 @@ package main.java.com.biblioteca.view;
 
 import java.util.Scanner;
 
-public class MenuOpcoes {
-	Scanner sc = new Scanner(System.in);
-	
-	public void exibirMenuOpcoesLimitado() {
-		System.out.println("\n ==========================================");
-		System.out.println("*       Escolha a opção abaixo              *");
-		System.out.println("*                                           *");
-		System.out.println("*    (1) - Alterar Livro       		        *");
-		System.out.println("*    (2) - Alterar Usuário 		            *");
-		System.out.println("*    (3) - Alterar empréstimo   	        *");
-		System.out.println("*    (4) - Deletar livro                    *");
-		System.out.println("*    (5) - Deletar Usuário                  *");
-		System.out.println("*    (6) - Deletar Emprestimo               *");
-		System.out.println("*    (0) - Sair do sistema                  *");
-		System.out.println("*                                           *");
-		System.out.println("  ==========================================");
-	}
-	public void exibirMenuOpcoesAdmin() {
-		System.out.println("\n ==========================================");
-		System.out.println("*       Escolha a opção abaixo              *");
-		System.out.println("*                                           *");
-		System.out.println("*    (1) - Alterar Livro       		        *");
-		System.out.println("*    (2) - Alterar Usuário 		            *");
-		System.out.println("*    (3) - Alterar empréstimo   	        *");
-		System.out.println("*    (4) - Deletar livro                    *");
-		System.out.println("*    (5) - Deletar Usuário                  *");
-		System.out.println("*    (6) - Deletar Emprestimo               *");
-		System.out.println("*    (7) - Deletar Banco de dados           *");
-		System.out.println("*    (0) - Sair do sistema                  *");
-		System.out.println("*                                           *");
-		System.out.println("  ==========================================");
-	}
-	
-	public void opcoesLimitado(String opcao) {
-		do {
-			opcao = sc.nextLine();
-			//sc.nextLine();
-			try {
-				switch (opcao) {
-					case "1" ->  {System.out.println("opcao 1");}
-					case "2" ->  {System.out.println("opcao 2");}
-					case "3" ->  {System.out.println("opcao 3");}
-					case "4" ->  {System.out.println("opcao 4");}
-					case "5" ->  {System.out.println("opcao 5");}
-					case "6" ->  {System.out.println("opcao 6");}
-					case "0" ->  {System.out.println("Sair");}
-					default  ->  throw new IllegalArgumentException("Unexpected value: " + opcao);
-				}
-			} catch (Exception e) {
-				System.out.println("Erro: " + e.getMessage());
-			}			
-		}while (!opcao.equals("0"));
-	}
-	
-	public void opcoesAdmin(String opcao) {
-		do {
-			opcao = sc.nextLine();
-			//sc.nextLine();
-			try {
-				switch (opcao) {
-					case "1" ->  {System.out.println("opcao 1");}
-					case "2" ->  {System.out.println("opcao 2");}
-					case "3" ->  {System.out.println("opcao 3");}
-					case "4" ->  {System.out.println("opcao 4");}
-					case "5" ->  {System.out.println("opcao 5");}
-					case "6" ->  {System.out.println("opcao 6");}
-					case "7" ->  {System.out.println("opcao 7");}
-					case "0" ->  {System.out.println("Sair");}
-					default  ->  throw new IllegalArgumentException("Unexpected value: " + opcao);
-				}
-			} catch (Exception e) {
-				System.out.println("Erro: " + e.getMessage());
-			}			
-		}while (!opcao.equals("0"));
-	}
-	
-	
+import main.java.com.biblioteca.model.UsuarioSistema;
+import main.java.com.biblioteca.service.AutenticacaoService;
+
+public class MenuLogin {
+
+    private Scanner sc = new Scanner(System.in);
+    private AutenticacaoService Auth = new AutenticacaoService();
+
+    private void exibirMenuLogin() {
+        System.out.println("\n  ==========================================");
+        System.out.println("*       Escolha a opção abaixo de login     *");
+        System.out.println("*                                           *");
+        System.out.println("*    (1) - Usuário ADMIN                    *");
+        System.out.println("*    (2) - Usuário Bibliotecario            *");
+        System.out.println("*    (0) - Fechar sistema                   *");
+        System.out.println("*                                           *");
+        System.out.println("  ==========================================");
+    }
+
+    public UsuarioSistema fazerLogin() {
+        String option;
+
+        while (true) {
+            exibirMenuLogin();
+            option = sc.nextLine();
+
+            if (option.equals("0")) {
+                System.out.println("Sistema encerrado.");
+                return null;
+            }
+
+            System.out.println(" ==========================================");
+            System.out.println("*       Digite seu usuário                 *");
+            System.out.println(" ==========================================");
+            String usuario = sc.nextLine();
+
+            System.out.println(" ==========================================");
+            System.out.println("*       Digite sua senha                   *");
+            System.out.println(" ==========================================");
+            String senha = sc.nextLine();
+
+            try {
+                UsuarioSistema u = Auth.fazerLogin(usuario, senha);
+
+                if (u == null) {
+                    System.out.println("Usuário ou senha incorretos!");
+                    continue;
+                }
+
+                switch (option) {
+                    case "1":
+                        if (u.getTipo().equalsIgnoreCase("ADMIN")) {
+                            System.out.println("Login bem-sucedido como ADMIN.");
+                            return u;
+                        } else {
+                            System.out.println("Você não tem permissão como ADMIN.");
+                        }
+                        break;
+
+                    case "2":
+                        if (u.getTipo().equalsIgnoreCase("BIBLIOTECARIO")) {
+                            System.out.println("Login bem-sucedido como BIBLIOTECARIO.");
+                            return u;
+                        } else {
+                            System.out.println("Você não tem permissão como BIBLIOTECARIO.");
+                        }
+                        break;
+
+                    default:
+                        System.out.println("Opção inválida: " + option);
+                        break;
+                }
+
+            } catch (Exception e) {
+                System.out.println("Erro: " + e.getMessage());
+                System.out.println("Tente novamente!");
+            }
+        }
+    }
 }
