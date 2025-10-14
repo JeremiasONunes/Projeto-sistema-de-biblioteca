@@ -1,84 +1,79 @@
 package main.java.com.biblioteca.view;
 
+import main.java.com.biblioteca.exception.*;
+import main.java.com.biblioteca.model.*;
+import main.java.com.biblioteca.service.*;
 import java.util.Scanner;
 
-import main.java.com.biblioteca.model.UsuarioSistema;
-import main.java.com.biblioteca.service.AutenticacaoService;
+public class MenuPrincipal {
 
-public class MenuLogin {
+    Scanner sc = new Scanner(System.in);
+    BibliotecaService biblioteca = new BibliotecaService();
+    MenuLivro ml = new MenuLivro(biblioteca);
+    MenuUsuario mu = new MenuUsuario(biblioteca);
+    MenuEmprestimo me = new MenuEmprestimo(biblioteca);
+    private MenuLogin menuLogin = new MenuLogin();
 
-    private Scanner sc = new Scanner(System.in);
-    private AutenticacaoService Auth = new AutenticacaoService();
+    public void iniciarSistema() {
+        System.out.println("Sistema Inicializando ...");
 
-    private void exibirMenuLogin() {
-        System.out.println("\n  ==========================================");
-        System.out.println("*       Escolha a opção abaixo de login     *");
-        System.out.println("*                                           *");
-        System.out.println("*    (1) - Usuário ADMIN                    *");
-        System.out.println("*    (2) - Usuário Bibliotecario            *");
-        System.out.println("*    (0) - Fechar sistema                   *");
-        System.out.println("*                                           *");
-        System.out.println("  ==========================================");
-    }
+        // Realiza o login
+        UsuarioSistema usuarioLogado = menuLogin.fazerLogin();
 
-    public UsuarioSistema fazerLogin() {
-        String option;
+        if (usuarioLogado == null) {
+            System.out.println("Login não realizado. Encerrando sistema.");
+            return;
+        }
 
-        while (true) {
-            exibirMenuLogin();
-            option = sc.nextLine();
+        System.out.println("Login realizado com sucesso!");
+        System.out.println("Bem-vindo(a), " + usuarioLogado.getNome() + " (" + usuarioLogado.getTipo() + ")");
+        System.out.println("Sistema Inicializado!");
 
-            if (option.equals("0")) {
-                System.out.println("Sistema encerrado.");
-                return null;
-            }
+        String opcao;
 
-            System.out.println(" ==========================================");
-            System.out.println("*       Digite seu usuário                 *");
-            System.out.println(" ==========================================");
-            String usuario = sc.nextLine();
-
-            System.out.println(" ==========================================");
-            System.out.println("*       Digite sua senha                   *");
-            System.out.println(" ==========================================");
-            String senha = sc.nextLine();
+        do {
+            exibirMenuPrincipal();
+            opcao = sc.nextLine();
 
             try {
-                UsuarioSistema u = Auth.fazerLogin(usuario, senha);
-
-                if (u == null) {
-                    System.out.println("Usuário ou senha incorretos!");
-                    continue;
+                switch (opcao) {
+                    case "1" -> ml.cadastrarLivro();
+                    case "2" -> mu.cadastrarUsuario();
+                    case "3" -> me.cadastrarEmprestimo();
+                    case "4" -> ml.pesquisarLivro();
+                    case "5" -> mu.pesquisarUsuario();
+                    case "6" -> me.devolucao();
+                    case "7" -> mu.ListarUsuario();
+                    case "8" -> me.ListarEmprestimos();
+                    case "9" -> ml.listarLivros();
+                    case "10" -> System.out.println("Menu de opções ainda em construção.");
+                    case "0" -> System.out.println("Encerrando sistema. Até logo!");
+                    default -> throw new IllegalArgumentException("Opção inválida: " + opcao);
                 }
-
-                switch (option) {
-                    case "1":
-                        if (u.getTipo().equalsIgnoreCase("ADMIN")) {
-                            System.out.println("Login bem-sucedido como ADMIN.");
-                            return u;
-                        } else {
-                            System.out.println("Você não tem permissão como ADMIN.");
-                        }
-                        break;
-
-                    case "2":
-                        if (u.getTipo().equalsIgnoreCase("BIBLIOTECARIO")) {
-                            System.out.println("Login bem-sucedido como BIBLIOTECARIO.");
-                            return u;
-                        } else {
-                            System.out.println("Você não tem permissão como BIBLIOTECARIO.");
-                        }
-                        break;
-
-                    default:
-                        System.out.println("Opção inválida: " + option);
-                        break;
-                }
-
             } catch (Exception e) {
                 System.out.println("Erro: " + e.getMessage());
-                System.out.println("Tente novamente!");
             }
-        }
+
+        } while (!opcao.equals("0"));
+    }
+
+    private void exibirMenuPrincipal() {
+        System.out.println("\n ==========================================");
+        System.out.println("*       Escolha a opção abaixo              *");
+        System.out.println("*                                           *");
+        System.out.println("*    (1) - Cadastrar novo Livro             *");
+        System.out.println("*    (2) - Cadastrar novo Usuário           *");
+        System.out.println("*    (3) - Cadastrar novo Empréstimo        *");
+        System.out.println("*    (4) - Pesquisar Livro                  *");
+        System.out.println("*    (5) - Pesquisar Usuário                *");
+        System.out.println("*    (6) - Devolver Livro                   *");
+        System.out.println("*    (7) - Listar Usuários                  *");
+        System.out.println("*    (8) - Listar Empréstimos               *");
+        System.out.println("*    (9) - Listar Livros                    *");
+        System.out.println("*   (10) - Menu de opções                   *");
+        System.out.println("*    (0) - Sair do sistema                  *");
+        System.out.println("*                                           *");
+        System.out.println("  ==========================================");
+        System.out.print("Opção: ");
     }
 }
